@@ -1,0 +1,20 @@
+<package>
+  <name>xsens_imu_driver</name>
+  <version>0.0.1</version>
+  <description>ROS driver for Xsens MTi-10 and MTi-100 series motion trackers</description>
+  <maintainer email="jjy0923@gmail.com">Jinyong Jeong, Youngsang Park</maintainer>
+  <license>BSD</license>
+
+  <author>Jinyong Jeong</author>
+  <author>Youngsang park</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+</package>
