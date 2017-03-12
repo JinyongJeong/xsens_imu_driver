@@ -46,9 +46,18 @@
 #include <conio.h>
 #endif
 
+#include <ros/ros.h>
+#include <xsens_imu_driver/xsens_imu.h>
+
 int main(int argc, char* argv[])
 {
 	DeviceClass device;
+
+
+    ros::init(argc, argv, "xsens_imu_driver_node");
+    ros::NodeHandle nh;
+    ros::Publisher xsens_imu_pub = nh.advertise<xsens_imu_driver::xsens_imu>("xsens_imu_data", 10);
+    xsens_imu_driver::xsens_imu xsens_data;
 
 	try
 	{
@@ -58,7 +67,7 @@ int main(int argc, char* argv[])
 		xsEnumerateUsbDevices(portInfoArray);
 		if (!portInfoArray.size())
 		{
-			std::string portName = "/dev/ttyUSB4";
+			std::string portName = "/dev/ttyUSB0";
 			int baudRate = 115200;
 #ifdef WIN32
 			std::cout << "No USB Motion Tracker found." << std::endl << std::endl << "Please enter COM port name (eg. COM1): " <<
@@ -168,6 +177,12 @@ int main(int argc, char* argv[])
 
 					// Get the quaternion data
 					XsQuaternion quaternion = packet.orientationQuaternion();
+
+                    xsens_data.quaternion_data.w = quaternion.w();
+                    xsens_data.quaternion_data.x = quaternion.x();
+                    xsens_data.quaternion_data.y = quaternion.y();
+                    xsens_data.quaternion_data.z = quaternion.z();
+
 					std::cout << "\r"
 							  << "W:" << std::setw(5) << std::fixed << std::setprecision(2) << quaternion.w()
 							  << ",X:" << std::setw(5) << std::fixed << std::setprecision(2) << quaternion.x()
@@ -176,16 +191,31 @@ int main(int argc, char* argv[])
 					;
 
 					// Convert packet to euler
+
 					XsEuler euler = packet.orientationEuler();
+
+                    xsens_data.eular_data.x = euler.roll();
+                    xsens_data.eular_data.y = euler.pitch();
+                    xsens_data.eular_data.z = euler.yaw();
+
 					std::cout << ",Roll:" << std::setw(7) << std::fixed << std::setprecision(2) << euler.roll()
 							  << ",Pitch:" << std::setw(7) << std::fixed << std::setprecision(2) << euler.pitch()
 							  << ",Yaw:" << std::setw(7) << std::fixed << std::setprecision(2) << euler.yaw()
 					;
 
 					std::cout << std::flush;
+
+                    xsens_data.header.stamp  = ros::Time::now();
+                    xsens_data.header.frame_id = "xsens_imu";
+                    xsens_imu_pub.publish(xsens_data);
 				}
+
+
 				msgs.clear();
 				XsTime::msleep(0);
+
+
+
 			}
 			_getch();
 			std::cout << "\n" << std::string(79, '-') << "\n";
