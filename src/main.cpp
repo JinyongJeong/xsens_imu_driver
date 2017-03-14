@@ -67,8 +67,13 @@ int main(int argc, char* argv[])
 		xsEnumerateUsbDevices(portInfoArray);
 		if (!portInfoArray.size())
 		{
+
 			std::string portName = "/dev/ttyUSB-mti";
 			int baudRate = 115200;
+
+            ros::param::param<std::string>("~device", portName, "/dev/ttyUSB-alt");
+            ros::param::param<int>("~baudrate", baudRate, 115200);
+
 #ifdef WIN32
 			std::cout << "No USB Motion Tracker found." << std::endl << std::endl << "Please enter COM port name (eg. COM1): " <<
 #else
